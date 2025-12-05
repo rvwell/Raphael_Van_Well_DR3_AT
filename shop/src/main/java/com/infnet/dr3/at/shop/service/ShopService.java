@@ -2,9 +2,12 @@ package com.infnet.dr3.at.shop.service;
 
 import com.infnet.dr3.at.shop.client.DiscountClient;
 import com.infnet.dr3.at.shop.client.ProductClient;
+import com.infnet.dr3.at.shop.domain.dto.ProductDTO;
 import com.infnet.dr3.at.shop.domain.model.OrderResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -12,6 +15,10 @@ public class ShopService {
 
     private final ProductClient productClient;
     private final DiscountClient discountClient;
+
+    public List<ProductDTO> getAllProducts() {
+        return productClient.getAllProducts();
+    }
 
     public OrderResponse calculateOrder(Long productId) {
 
