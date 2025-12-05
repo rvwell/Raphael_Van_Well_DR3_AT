@@ -11,7 +11,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
-      - microservices-network
+      - at-network
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/products || exit 1"]
       interval: 30s
@@ -29,7 +29,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
-      - microservices-network
+      - at-network
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8082/discount/current || exit 1"]
       interval: 30s
@@ -54,7 +54,7 @@ services:
       discount-service:
         condition: service_healthy
     networks:
-      - microservices-network
+      - at-network
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/shop/products || exit 1"]
       interval: 30s
@@ -63,6 +63,6 @@ services:
       start_period: 40s
 
 networks:
-  microservices-network:
+  at-network:
     driver: bridge
 
