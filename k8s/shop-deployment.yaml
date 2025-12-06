@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-service
+  namespace: dr3-at
+  labels:
+    app: shop-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop-service
+  template:
+    metadata:
+      labels:
+        app: shop-service
+    spec:
+      containers:
+      - name: shop-service
+        image: shop-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              name: dr3-at-config
+              key: SPRING_PROFILES_ACTIVE
+        - name: PRODUCT_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: dr3-at-config
+              key: PRODUCT_SERVICE_URL
+        - name: DISCOUNT_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: dr3-at-config
+              key: DISCOUNT_SERVICE_URL
+        livenessProbe:
+          httpGet:
+            path: /shop/products
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /shop/products
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+

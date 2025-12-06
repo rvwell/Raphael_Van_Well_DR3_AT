@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dr3-at-config
+  namespace: dr3-at
+data:
+  PRODUCT_SERVICE_URL: "http://product-service:8081"
+  DISCOUNT_SERVICE_URL: "http://discount-service:8082"
+  SPRING_PROFILES_ACTIVE: "docker"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/productdb"
+  SPRING_DATASOURCE_USERNAME: "postgres"
+

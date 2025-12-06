@@ -1,6 +1,25 @@
-version: '3.8'
+name: dr3-at
 
 services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=productdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    networks:
+      - at-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   product-service:
     build:
       context: ..
@@ -12,12 +31,10 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - at-network
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/products || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 
   discount-service:
     build:
@@ -30,12 +47,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - at-network
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8082/discount/current || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+
 
   shop-service:
     build:
@@ -48,21 +60,15 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - PRODUCT_SERVICE_URL=http://product-service:8081
       - DISCOUNT_SERVICE_URL=http://discount-service:8082
-    depends_on:
-      product-service:
-        condition: service_healthy
-      discount-service:
-        condition: service_healthy
+
     networks:
       - at-network
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/shop/products || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+
 
 networks:
   at-network:
     driver: bridge
+
+volumes:
+  postgres-data:
 
